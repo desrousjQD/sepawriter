@@ -130,12 +130,17 @@ namespace SepaWriter
             CheckTransactionIdUnicity(transfer.Id, transfer.EndToEndId);
             if (requestedExecutionDate.HasValue)
             {
-                SepaPayment<T> payement = this.payments.FirstOrDefault(p => p.RequestedExecutionDate.Equals(requestedExecutionDate));
+                SepaPayment<T> payement = payments.FirstOrDefault(p => p.RequestedExecutionDate.Equals(requestedExecutionDate));
                 if (payement == null)
-					payement = new SepaPayment<T>()
+                {
+                    payement = new SepaPayment<T>()
                     {
                         RequestedExecutionDate = requestedExecutionDate.Value,
                     };
+
+					payments.Add(payement);
+
+				}
                 payement.AddTransfer(transfer);
 			}
             else

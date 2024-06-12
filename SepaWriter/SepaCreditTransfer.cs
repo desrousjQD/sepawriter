@@ -74,9 +74,9 @@ namespace SepaWriter
         /// </summary>
         /// <param name="transfer"></param>
         /// <exception cref="ArgumentNullException">If transfert is null.</exception>
-        public void AddCreditTransfer(SepaCreditTransferTransaction transfer)
+        public void AddCreditTransfer(SepaCreditTransferTransaction transfer, DateTime? requestedExecutionDate = null)
         {
-            AddTransfer(transfer);
+            AddTransfer(transfer, requestedExecutionDate);
         }
 
         /// <summary>

@@ -66,9 +66,9 @@ namespace SepaWriter
         /// </summary>
         /// <param name="transfer"></param>
         /// <exception cref="ArgumentNullException">If transfert is null.</exception>
-        public void AddDebitTransfer(SepaDebitTransferTransaction transfer)
+        public void AddDebitTransfer(SepaDebitTransferTransaction transfer,DateTime? requestedExecutionDate=null)
         {
-            AddTransfer(transfer);
+            AddTransfer(transfer, requestedExecutionDate);
         }
 
         /// <summary>
@@ -99,18 +99,43 @@ namespace SepaWriter
 					NewElement("Othr").NewElement("Id", InitiatingPartyId);
 			}
 
-            // Part 2: Payment Information for each Sequence Type.
-            foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
+            if (payments != null && payments.Count > 0)
             {
-                var seqTransactions = transactions.FindAll(d => d.SequenceType == seqTp);
-                var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions);
-                // If a payment information has been created
-                if (pmtInf != null)
+                payments.ForEach(payment =>
                 {
-                    // Part 3: Debit Transfer Transaction Information
-                    foreach (var transfer in seqTransactions)
+					// Part 2: Payment Information for each Sequence Type.
+					foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
+					{
+						var seqTransactions = payment.Transactions.FindAll(d => d.SequenceType == seqTp);
+						var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions, payment.RequestedExecutionDate);
+						// If a payment information has been created
+						if (pmtInf != null)
+						{
+							// Part 3: Debit Transfer Transaction Information
+							foreach (var transfer in seqTransactions)
+							{
+								GenerateTransaction(pmtInf, transfer);
+							}
+						}
+					}
+				});
+
+			}
+            else
+            {
+                // Part 2: Payment Information for each Sequence Type.
+                foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
+                {
+                    var seqTransactions = transactions.FindAll(d => d.SequenceType == seqTp);
+                    var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions);
+                    // If a payment information has been created
+                    if (pmtInf != null)
                     {
-                        GenerateTransaction(pmtInf, transfer);
+                        // Part 3: Debit Transfer Transaction Information
+                        foreach (var transfer in seqTransactions)
+                        {
+                            GenerateTransaction(pmtInf, transfer);
+                        }
                     }
                 }
             }
@@ -124,7 +149,7 @@ namespace SepaWriter
         /// <param name="xml">The XML object to write</param>
         /// <param name="sqType">The Sequence Type</param>
         /// <param name="seqTransactions">The transactions of the specified type</param>
-        private XmlElement GeneratePaymentInformation(XmlDocument xml, SepaSequenceType sqType, IEnumerable<SepaDebitTransferTransaction> seqTransactions)
+        private XmlElement GeneratePaymentInformation(XmlDocument xml, SepaSequenceType sqType, IEnumerable<SepaDebitTransferTransaction> seqTransactions,DateTime? requestedExecutionDate = null)
         {
             int controlNumber = 0;
             decimal controlSum = 0;
@@ -153,9 +178,11 @@ namespace SepaWriter
             pmtTpInf.NewElement("SvcLvl").NewElement("Cd", "SEPA");
             pmtTpInf.NewElement("LclInstrm").NewElement("Cd", LocalInstrumentCode);
             pmtTpInf.NewElement("SeqTp", SepaSequenceTypeUtils.SepaSequenceTypeToString(sqType));
-
-            pmtInf.NewElement("ReqdColltnDt", StringUtils.FormatDate(RequestedExecutionDate));
-            pmtInf.NewElement("Cdtr").NewElement("Nm", Creditor.Name);
+            if (requestedExecutionDate.HasValue)
+                pmtInf.NewElement("ReqdColltnDt", StringUtils.FormatDate(requestedExecutionDate.Value));
+            else
+                pmtInf.NewElement("ReqdColltnDt", StringUtils.FormatDate(RequestedExecutionDate));
+			pmtInf.NewElement("Cdtr").NewElement("Nm", Creditor.Name);
 
             var dbtrAcct = pmtInf.NewElement("CdtrAcct");
             dbtrAcct.NewElement("Id").NewElement("IBAN", Creditor.Iban);
