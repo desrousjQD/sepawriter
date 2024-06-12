@@ -163,7 +163,7 @@ namespace SepaWriter
             DateTime requestedExecutionDate = this.RequestedExecutionDate;
             if (payment != null)
                 requestedExecutionDate = payment.RequestedExecutionDate;
-			pmtInf.NewElement("ReqdExctnDt", StringUtils.FormatDate(payment.RequestedExecutionDate));
+			pmtInf.NewElement("ReqdExctnDt", StringUtils.FormatDate(requestedExecutionDate));
 			var dbtr = pmtInf.NewElement("Dbtr");
 			dbtr.NewElement("Nm", Debtor.Name);
 			if (Debtor.Address != null)
