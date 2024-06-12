@@ -100,48 +100,30 @@ namespace SepaWriter
 			}
 
             if (payments != null && payments.Count > 0)
-            {
-                payments.ForEach(payment =>
-                {
-					// Part 2: Payment Information for each Sequence Type.
-					foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
-					{
-						var seqTransactions = payment.Transactions.FindAll(d => d.SequenceType == seqTp);
-						var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions, payment.RequestedExecutionDate);
-						// If a payment information has been created
-						if (pmtInf != null)
-						{
-							// Part 3: Debit Transfer Transaction Information
-							foreach (var transfer in seqTransactions)
-							{
-								GenerateTransaction(pmtInf, transfer);
-							}
-						}
-					}
-				});
-
-			}
+                payments.ForEach(payment => GenerateAllPayment(xml, payment.RequestedExecutionDate));
             else
-            {
-                // Part 2: Payment Information for each Sequence Type.
-                foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
-                {
-                    var seqTransactions = transactions.FindAll(d => d.SequenceType == seqTp);
-                    var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions);
-                    // If a payment information has been created
-                    if (pmtInf != null)
-                    {
-                        // Part 3: Debit Transfer Transaction Information
-                        foreach (var transfer in seqTransactions)
-                        {
-                            GenerateTransaction(pmtInf, transfer);
-                        }
-                    }
-                }
-            }
-
+                GenerateAllPayment(xml);
             return xml;
         }
+
+
+        private void GenerateAllPayment(XmlDocument xml, DateTime? requestedExecutionDate= null)
+        {
+			foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
+			{
+				var seqTransactions = transactions.FindAll(d => d.SequenceType == seqTp);
+				var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions, requestedExecutionDate);
+				// If a payment information has been created
+				if (pmtInf != null)
+				{
+					// Part 3: Debit Transfer Transaction Information
+					foreach (var transfer in seqTransactions)
+					{
+						GenerateTransaction(pmtInf, transfer);
+					}
+				}
+			}
+		}
 
         /// <summary>
         /// Generate a Payment Information node for a Sequence Type.
