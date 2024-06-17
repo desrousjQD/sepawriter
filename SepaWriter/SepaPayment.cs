@@ -11,8 +11,6 @@ namespace SepaWriter
     /// </summary>
     public class SepaPayment<T> where T : SepaTransferTransaction, ICloneable
 	{
-
-		protected decimal paymentControlSum;
 		protected readonly List<T> transactions = new List<T>();
 
 		/// <summary>

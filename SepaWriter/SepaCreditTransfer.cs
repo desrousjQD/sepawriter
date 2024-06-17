@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using log4net.Util;
@@ -139,8 +140,17 @@ namespace SepaWriter
 			pmtInf.NewElement("PmtInfId", PaymentInfoId ?? MessageIdentification);
 
 			pmtInf.NewElement("PmtMtd", Constant.CreditTransfertPaymentMethod);
-			pmtInf.NewElement("NbOfTxs", numberOfTransactions);
-			pmtInf.NewElement("CtrlSum", StringUtils.FormatAmount(paymentControlSum));
+
+			int transactionCount = numberOfTransactions;
+            decimal sumControl = paymentControlSum;
+			if (payment != null)
+            {
+				transactionCount = payment.Transactions.Count;
+				sumControl = payment.Transactions.Sum(t => t.Amount);
+
+			}
+			pmtInf.NewElement("NbOfTxs", transactionCount);
+			pmtInf.NewElement("CtrlSum", StringUtils.FormatAmount(sumControl));
 
 			if (IsInternational)
 			{

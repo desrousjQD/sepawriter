@@ -3,9 +3,9 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>Perrich.SepaWriter.Test</AssemblyName>
+    <AssemblyName>qd.SepaWriter.Test</AssemblyName>
 
-    <RootNamespace>Perrich.SepaWriter.Test</RootNamespace>
+    <RootNamespace>qd.SepaWriter.Test</RootNamespace>
 
     <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
