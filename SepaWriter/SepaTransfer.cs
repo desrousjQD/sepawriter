@@ -152,7 +152,7 @@ namespace SepaWriter
 
         protected List<T> GetTransfer()
         {
-            List<T> transferts = transactions;
+            List<T> transferts = transactions.Select(t => (T)t.Clone()).ToList();
             if (payments != null)
                 transferts.AddRange(payments.SelectMany(p => p.Transactions));
             return transferts;

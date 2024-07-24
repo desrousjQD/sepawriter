@@ -100,18 +100,22 @@ namespace SepaWriter
 			}
 
             if (payments != null && payments.Count > 0)
-                payments.ForEach(payment => GenerateAllPayment(xml, payment.RequestedExecutionDate));
+                payments.ForEach(payment => GenerateAllPayment(xml, payment.RequestedExecutionDate, payment.Transactions));
             else
                 GenerateAllPayment(xml);
             return xml;
         }
 
 
-        private void GenerateAllPayment(XmlDocument xml, DateTime? requestedExecutionDate= null)
+        private void GenerateAllPayment(XmlDocument xml, DateTime? requestedExecutionDate= null, List<SepaDebitTransferTransaction> transactionsPayement = null)
         {
+            List<SepaDebitTransferTransaction> trans = transactions;
+
+			if (transactionsPayement != null)
+				trans = transactionsPayement;
 			foreach (SepaSequenceType seqTp in Enum.GetValues(typeof(SepaSequenceType)))
 			{
-				var seqTransactions = transactions.FindAll(d => d.SequenceType == seqTp);
+				var seqTransactions = trans.FindAll(d => d.SequenceType == seqTp);
 				var pmtInf = GeneratePaymentInformation(xml, seqTp, seqTransactions, requestedExecutionDate);
 				// If a payment information has been created
 				if (pmtInf != null)

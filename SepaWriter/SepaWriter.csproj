@@ -27,13 +27,14 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RootNamespace>SepaWriter</RootNamespace>
     <AssemblyName>qd.SepaWriter</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>fork </Description>
+    <Description>fork  from perrich/sepawriter</Description>
     <Company>Quadra Diffusion</Company>
-    <PackAsTool>True</PackAsTool>
+    <PackAsTool>False</PackAsTool>
+    <PackageProjectUrl></PackageProjectUrl>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
 </Project>
